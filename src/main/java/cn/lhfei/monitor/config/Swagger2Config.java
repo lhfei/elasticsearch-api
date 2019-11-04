@@ -16,7 +16,7 @@
 
 package cn.lhfei.monitor.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,15 +38,12 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @EnableSwagger2
 @Configuration
+@ConfigurationProperties(prefix = "swagger")
 public class Swagger2Config {
-
-	@Value(value = "${swagger.enabled}")
-    private Boolean swaggerEnabled;
-	
 	@Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo())
-                .enable(swaggerEnabled).select()
+                .enable(enabled).select()
                 .apis(RequestHandlerSelectors.basePackage("cn.lhfei.monitor.resources"))
                 .paths(PathSelectors.any()).build();
     }
@@ -59,4 +56,14 @@ public class Swagger2Config {
                 .version("1.0.0")
                 .build();
     }
+    
+    public Boolean getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	private Boolean enabled;
 }
