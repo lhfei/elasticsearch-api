@@ -43,7 +43,7 @@ import cn.lhfei.monitor.model.YellowTripdata;
  */
 @RestController
 @RequestMapping("/")
-public class NycResource extends BaseResouce {
+public class NycResource extends BaseResource {
 	private static final Gson gson = new Gson();
 
 	@RequestMapping(value = "/yellow_tripdata", method = { RequestMethod.GET })

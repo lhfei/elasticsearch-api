@@ -12,7 +12,18 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
-          
 swagger:
   enabled: true
   
+elastic:
+  index-name: fly-es
+  port: 9220
+  protocol: http
+  nodes:
+  - 192.168.133.138
+  - 192.168.133.146
+  - 192.168.133.152
+  - 192.168.133.160
+  - 192.168.133.170
+  - 192.168.133.173
+  - 192.168.134.1

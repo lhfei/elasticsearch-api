@@ -17,14 +17,15 @@
 package cn.lhfei.monitor.resources;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,15 +44,13 @@ import cn.lhfei.monitor.model.Product;
  */
 @RestController
 @RequestMapping("/")
-public class ProductResouce extends BaseResouce {
+public class ProductResouce extends BaseResource {
 	private static final Gson gson = new Gson();
 	private static final String INDEX_NAME = "products";
 	
 	@RequestMapping(value = "/product", method = { RequestMethod.POST })
 	public IndexResponse create(@RequestBody Product product) throws IOException {
-		RestHighLevelClient client = super.buildClient();
 		IndexRequest indexRequest = new IndexRequest(INDEX_NAME)
-//			    .id(String.valueOf(product.getId()))
 			    .source(gson.toJson(product), XContentType.JSON);
 		
 		IndexResponse idxResponse = client.index(indexRequest, RequestOptions.DEFAULT);
@@ -59,14 +58,13 @@ public class ProductResouce extends BaseResouce {
 		return idxResponse;
 	}
 	
-	@RequestMapping(value = "/product", method = { RequestMethod.GET })
-	public GetResponse read() throws IOException {
-		RestHighLevelClient client = super.buildClient();
+	@RequestMapping(value = "/product/{id:\\w{6,}}", method = { RequestMethod.GET })
+	public Map<String, Object> get(@PathVariable(name = "id") String id) throws IOException {
 		
-		GetRequest getRequest = new GetRequest(INDEX_NAME, "1");
+		GetRequest getRequest = new GetRequest(INDEX_NAME, id);
 		
 		GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
 		
-		return getResponse;
+		return getResponse.getSource();
 	}
 }

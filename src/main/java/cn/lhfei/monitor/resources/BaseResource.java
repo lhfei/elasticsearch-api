@@ -21,6 +21,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @version 0.1
@@ -30,7 +31,7 @@ import org.slf4j.LoggerFactory;
  * @created on Oct 23, 2019
  */
 
-public abstract class BaseResouce {
+public abstract class BaseResource {
 	protected Logger LOG = LoggerFactory.getLogger(this.getClass());
 	
 	private ThreadLocal<RestHighLevelClient> clientThread = new ThreadLocal<RestHighLevelClient>() {
@@ -54,4 +55,7 @@ public abstract class BaseResouce {
 	protected RestHighLevelClient buildClient() {
 		return clientThread.get();
 	}
+	
+	 @Autowired
+	 protected RestHighLevelClient client;
 }

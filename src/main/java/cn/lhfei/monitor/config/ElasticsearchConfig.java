@@ -16,10 +16,18 @@
 
 package cn.lhfei.monitor.config;
 
+import java.util.Objects;
+
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.client.RestClients;
-import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.util.StringUtils;
 
 /**
  * @version 0.1
@@ -28,11 +36,35 @@ import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfig
  *
  * @created on Oct 22, 2019
  */
-//@Configuration
-public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
-
-	@Override
-	public RestHighLevelClient elasticsearchClient() {
-		return RestClients.create(ClientConfiguration.create("localhost:9200")).rest();
+@Configuration
+public class ElasticsearchConfig {
+    @Bean
+    public RestClientBuilder restClientBuilder() {
+      HttpHost[] hosts = indexConfig.getNodes().stream()
+          .map(this::makeHttpHost)
+          .filter(Objects::nonNull)
+          .toArray(HttpHost[]::new);
+      return RestClient.builder(hosts);
+    }
+    
+	@Bean
+	public RestHighLevelClient highLevelClient(RestClientBuilder restClientBuilder) {
+		return new RestHighLevelClient(restClientBuilder);
 	}
+
+	@Bean
+	public ElasticsearchOperations elasticsearchTemplate() {
+		return new ElasticsearchRestTemplate(highLevelClient(restClientBuilder()));
+	}
+	
+	private HttpHost makeHttpHost(String host) {
+		if(!StringUtils.isEmpty(host.trim())) {
+			return new HttpHost(host.trim(), indexConfig.getPort(), indexConfig.getProtocol());
+		}
+		return null;
+	}
+	
+	@Autowired
+    private IndexConfig indexConfig;
 }
+
